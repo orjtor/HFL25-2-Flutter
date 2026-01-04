@@ -21,13 +21,26 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> signIn(String email, String password) async {
-    await _authRepository.signIn(email: email, password: password);
-    await _analytics.logLogin('email');
+    try {
+      await _authRepository.signIn(email: email, password: password);
+      await _analytics.logLogin('email');
+    } catch (e) {
+      emit(AuthError(e.toString().replaceAll('Exception: ', '')));
+      // Återgå till unauthenticated state efter kort tid
+      await Future.delayed(const Duration(seconds: 3));
+      if (state is AuthError) {
+        emit(AuthUnauthenticated());
+      }
+    }
   }
 
   Future<void> signOut() async {
-    await _authRepository.signOut();
-    await _analytics.logLogout();
+    try {
+      await _authRepository.signOut();
+      await _analytics.logLogout();
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
   }
 
   @override

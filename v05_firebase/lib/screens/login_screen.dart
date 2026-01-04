@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:v05_firebase/auth/cubit/auth_cubit.dart';
+import 'package:v05_firebase/auth/cubit/auth_state.dart';
+import 'package:v05_firebase/services/analytics_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,6 +15,13 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _analytics = AnalyticsService();
+
+  @override
+  void initState() {
+    super.initState();
+    _analytics.logScreenView('login_screen');
+  }
 
   @override
   void dispose() {
@@ -23,45 +32,58 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.amber,
-      appBar: AppBar(
-        title: const Text('Login View'),
-        backgroundColor: Colors.amberAccent,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Please enter an email' : null,
-              ),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) =>
-                    value!.isEmpty ? 'Please enter a password' : null,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    context.read<AuthCubit>().signIn(
-                      _emailController.text,
-                      _passwordController.text,
-                    );
-                  }
-                },
-                child: const Text('Login'),
-              ),
-            ],
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.amber,
+        appBar: AppBar(
+          title: const Text('Login View'),
+          backgroundColor: Colors.amberAccent,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  validator: (value) =>
+                      value!.isEmpty ? 'Please enter an email' : null,
+                ),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Password'),
+                  obscureText: true,
+                  validator: (value) =>
+                      value!.isEmpty ? 'Please enter a password' : null,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      context.read<AuthCubit>().signIn(
+                        _emailController.text,
+                        _passwordController.text,
+                      );
+                    }
+                  },
+                  child: const Text('Login'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
