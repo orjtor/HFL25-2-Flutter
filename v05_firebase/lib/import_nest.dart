@@ -1,5 +1,6 @@
 export 'package:flutter/material.dart';
 export 'package:firebase_core/firebase_core.dart';
+export 'package:firebase_analytics/firebase_analytics.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';
 export 'package:v05_firebase/auth/cubit/auth_cubit.dart';
 export 'package:v05_firebase/auth/cubit/auth_state.dart';
