@@ -25,6 +25,21 @@ class MyApp extends StatelessWidget {
             name: 'profile',
             builder: (context, state) => const ProfileView(),
           ),
+          GoRoute(
+            path: '/details/:id',
+            name: 'details',
+            builder: (context, state) {
+              final id = state.pathParameters['id'] ?? 'unknown';
+              return DetailView(id: id);
+            },
+          ),
+          GoRoute(
+            path: '/details',
+            name: 'details-empty',
+            builder: (context, state) {
+              return const DetailView(id: 'unknown');
+            },
+          ),
         ],
       ),
     ],
@@ -95,19 +110,45 @@ class _HomeViewState extends State<HomeView> {
           const Icon(Icons.home, size: 100, color: Colors.deepPurple),
           const SizedBox(height: 20),
           Text('Home View', style: Theme.of(context).textTheme.headlineMedium),
+          ElevatedButton(
+            onPressed: () {
+              context.push('/details/42');
+            },
+            child: Text('Goto Details for item 42'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.push('/details/43');
+            },
+            child: Text('Goto Details for item 43'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.push('/details/');
+            },
+            child: Text('Goto Details for null item'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.push('/details');
+            },
+            child: Text('Goto Details for no item'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.push('/details/unknown');
+            },
+            child: Text('Goto Details for unknown item'),
+          ),
         ],
       ),
     );
   }
 }
 
-class ProfileView extends StatefulWidget {
+class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
-  @override
-  State<ProfileView> createState() => _ProfileViewState();
-}
 
-class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -126,79 +167,56 @@ class _ProfileViewState extends State<ProfileView> {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class DetailView extends StatelessWidget {
+  final String id;
+  const DetailView({super.key, required this.id});
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    // Kontrollera om id saknas eller är ogiltigt
+    final bool isValidId = id != 'unknown' && id.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text(isValidId ? "Detail View $id" : "Detail View - Error"),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          children: [
+            Icon(
+              isValidId ? Icons.details : Icons.error_outline,
+              size: 100,
+              color: isValidId ? Colors.deepPurple : Colors.red,
             ),
+            const SizedBox(height: 20),
+            if (isValidId)
+              Text(
+                'Details for item: $id',
+                style: Theme.of(context).textTheme.headlineMedium,
+              )
+            else ...[
+              Text(
+                'ID saknas',
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineMedium?.copyWith(color: Colors.red),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Kunde inte hitta detaljer utan ett giltigt ID',
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => context.go('/home'),
+                child: const Text('Tillbaka till Home'),
+              ),
+            ],
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
