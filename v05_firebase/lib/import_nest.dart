@@ -1,4 +1,5 @@
 export 'package:flutter/material.dart';
+export 'package:flutter/foundation.dart';
 export 'package:firebase_core/firebase_core.dart';
 export 'package:firebase_analytics/firebase_analytics.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,4 +9,4 @@ export 'package:v05_firebase/auth/repository/auth_repository.dart';
 export 'package:v05_firebase/screens/home_screen.dart';
 export 'package:v05_firebase/screens/login_screen.dart';
 export 'package:v05_firebase/screens/splash_screen.dart';
-export 'firebase_options.dart';
+export 'package:v05_firebase/firebase_options.dart';

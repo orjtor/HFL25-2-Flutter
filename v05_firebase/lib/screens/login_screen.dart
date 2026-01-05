@@ -39,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SnackBar(
               content: Text(state.message),
               backgroundColor: Colors.red,
-              duration: const Duration(seconds: 3),
+              duration: const Duration(seconds: 5),
             ),
           );
         }
