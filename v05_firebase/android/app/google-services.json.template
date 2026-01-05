@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "984818247756",
-    "project_id": "sti-flutter-auth",
-    "storage_bucket": "sti-flutter-auth.firebasestorage.app"
+    "project_number": "YOUR_PROJECT_NUMBER",
+    "project_id": "YOUR_PROJECT_ID",
+    "storage_bucket": "YOUR_PROJECT_ID.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:984818247756:android:00498e977271cb8f046ce9",
+        "mobilesdk_app_id": "YOUR_MOBILE_SDK_APP_ID",
         "android_client_info": {
           "package_name": "com.example.v05_firebase"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA6iyTi-5ex0DmsrDy23AF7jx-cqFEKmpY"
+          "current_key": "YOUR_API_KEY_HERE"
         }
       ],
       "services": {
