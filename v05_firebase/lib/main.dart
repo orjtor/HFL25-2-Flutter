@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
         create: (context) => AuthCubit(context.read<AuthRepository>()),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
+          showSemanticsDebugger: false,
           title: 'Firebase Auth with Cubit',
           theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
           home: const AuthFlow(),
