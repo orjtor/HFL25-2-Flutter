@@ -11,11 +11,13 @@ class PostsList extends StatefulWidget {
 
 class _PostsListState extends State<PostsList> {
   final _scrollController = ScrollController();
+  bool _hasLoggedMidpoint = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    print('🎯 [PostsList] Initialized - ScrollController attached');
   }
 
   @override
@@ -29,10 +31,23 @@ class _PostsListState extends State<PostsList> {
             if (state.posts.isEmpty) {
               return const Center(child: Text('no posts'));
             }
-            debugPrint('Building ListView with ${state.posts.length} posts\n');
+            print(
+              '📊 [PostsList] Building ListView with ${state.posts.length} posts (hasReachedMax: ${state.hasReachedMax})',
+            );
 
             return ListView.builder(
               itemBuilder: (BuildContext context, int index) {
+                // Check if we're at the midpoint and log it
+                if (!_hasLoggedMidpoint && state.posts.length > 10) {
+                  final midpoint = state.posts.length ~/ 2;
+                  if (index == midpoint) {
+                    print(
+                      '📍 [PostsList] TRACKER POINT MID LIST - Rendering item at midpoint (index $midpoint of ${state.posts.length})',
+                    );
+                    _hasLoggedMidpoint = true;
+                  }
+                }
+
                 return index >= state.posts.length
                     ? const BottomLoader()
                     : PostListItem(post: state.posts[index]);
@@ -52,12 +67,35 @@ class _PostsListState extends State<PostsList> {
 
   @override
   void dispose() {
+    print('🗑️ [PostsList] Disposed - Cleaning up ScrollController');
     _scrollController.dispose();
     super.dispose();
   }
 
   void _onScroll() {
-    if (_isBottom) context.read<PostBloc>().add(PostFetched());
+    if (!_scrollController.hasClients) return;
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    final scrollPercentage = (currentScroll / maxScroll * 100).round();
+
+    // Log when reaching midpoint during scroll
+    if (scrollPercentage >= 45 &&
+        scrollPercentage <= 55 &&
+        !_hasLoggedMidpoint) {
+      print(
+        '📍 [PostsList] TRACKER POINT MID LIST - User scrolled to middle of list (~$scrollPercentage%)',
+      );
+      _hasLoggedMidpoint = true;
+    }
+
+    // Log when nearing bottom
+    if (_isBottom) {
+      print(
+        '⬇️ [PostsList] Reached bottom threshold (90%) - Triggering PostFetched',
+      );
+      context.read<PostBloc>().add(PostFetched());
+    }
   }
 
   bool get _isBottom {

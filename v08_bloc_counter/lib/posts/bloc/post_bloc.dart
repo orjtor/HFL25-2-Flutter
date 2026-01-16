@@ -33,14 +33,36 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   final http.Client _httpClient;
 
   Future<void> _onFetched(PostFetched event, Emitter<PostState> emit) async {
-    if (state.hasReachedMax) return;
+    if (state.hasReachedMax) {
+      print(
+        '🛑 [PostBloc] END LIST - Already reached max, no more posts to load',
+      );
+      return;
+    }
 
     try {
-      final posts = await _fetchPosts(startIndex: state.posts.length);
+      final currentPage = (state.posts.length / _postLimit).floor() + 1;
+      final startIndex = state.posts.length;
+
+      if (startIndex == 0) {
+        print('🚀 [PostBloc] LOAD LIST - Starting to fetch posts');
+      }
+
+      print(
+        '📄 [PostBloc] PAGE $currentPage - Fetching posts from index $startIndex (limit: $_postLimit)',
+      );
+
+      final posts = await _fetchPosts(startIndex: startIndex);
 
       if (posts.isEmpty) {
+        print('🛑 [PostBloc] END LIST - No more posts available (reached end)');
         return emit(state.copyWith(hasReachedMax: true));
       }
+
+      final newTotalPosts = state.posts.length + posts.length;
+      print(
+        '✅ [PostBloc] PAGE $currentPage - Loaded ${posts.length} posts. Total: $newTotalPosts',
+      );
 
       emit(
         state.copyWith(
@@ -48,7 +70,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           posts: [...state.posts, ...posts],
         ),
       );
-    } catch (_) {
+    } catch (error) {
+      print('❌ [PostBloc] ERROR - Failed to fetch posts: $error');
       emit(state.copyWith(status: PostStatus.failure));
     }
   }

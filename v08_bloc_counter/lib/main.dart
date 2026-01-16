@@ -5,7 +5,6 @@ import 'package:v08_bloc_counter/feature/counter/Bloc/counter_bloc.dart';
 import 'package:v08_bloc_counter/feature/counter/Cubit/counter_cubit.dart';
 import 'package:v08_bloc_counter/feature/counter/Screen/counter_screen.dart';
 import 'package:v08_bloc_counter/simple_bloc_observer.dart';
-import 'package:v08_bloc_counter/posts/posts.dart';
 
 void main() {
   Bloc.observer = const SimpleBlocObserver();
